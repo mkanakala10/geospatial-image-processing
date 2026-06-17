@@ -32,7 +32,7 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/geospatial_db
       SYNC_DATABASE_URL: postgresql://postgres:postgres@db:5432/geospatial_db
-      SECRET_KEY: dev-secret-change-me
+      SECRET_KEY: TlMI1Uu4_yBZHAORzEKkXdA44dy9lan4HHyoQUYo3zMuBAJDU4IEWofoR3gtt0tY
       CORS_ORIGINS: http://localhost:5173,http://localhost:4173
       APP_ENV: development
       INLINE_PROCESSING: "true"
