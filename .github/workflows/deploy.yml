@@ -28,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
@@ -41,7 +41,7 @@ jobs:
           # Settings → Secrets → Actions → New repository secret
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
           # Change /geospatial-saas/ to your actual repo name
-          VITE_BASE_PATH: /geospatial-saas/
+          VITE_BASE_PATH: /geospatial-image-processing/
         run: npm run build
 
       - name: Upload artifact
