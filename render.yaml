@@ -1,0 +1,35 @@
+# Free-tier Render deployment (personal / hobby use)
+# Docs: https://render.com/docs/blueprint-spec
+#
+# 1. Push this repo to GitHub
+# 2. Create a free Neon database: https://neon.tech
+# 3. In Render: New → Blueprint → connect repo
+# 4. Set GEMINI_API_KEY (optional) and update CORS_ORIGINS after GitHub Pages deploys
+
+services:
+  - type: web
+    name: geospatial-api
+    runtime: python
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: APP_ENV
+        value: production
+      - key: INLINE_PROCESSING
+        value: "true"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: SYNC_DATABASE_URL
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://YOUR_USERNAME.github.io
+      - key: GEMINI_API_KEY
+        sync: false

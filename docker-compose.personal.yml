@@ -1,0 +1,65 @@
+# Lightweight local stack for personal use — no Redis, Celery, or Flower.
+# Processing runs inline in the API (same as the free cloud deployment).
+#
+#   docker compose -f docker-compose.personal.yml up --build
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: geospatial_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    # Host 5433 avoids conflict with local Postgres on 5432. API uses db:5432 inside Docker.
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/geospatial_db
+      SYNC_DATABASE_URL: postgresql://postgres:postgres@db:5432/geospatial_db
+      SECRET_KEY: dev-secret-change-me
+      CORS_ORIGINS: http://localhost:5173,http://localhost:4173
+      APP_ENV: development
+      INLINE_PROCESSING: "true"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    environment:
+      # Browser runs on your Mac — call API via host port 8000 (not container localhost)
+      VITE_API_URL: http://localhost:8000
+      VITE_DEV_PROXY_TARGET: http://api:8000
+    depends_on:
+      - api
+    volumes:
+      - ./frontend:/app
+      - frontend_nm:/app/node_modules
+
+volumes:
+  pg_data:
+  frontend_nm:

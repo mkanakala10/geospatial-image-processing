@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>GeoSpatial</title>
+    <script>
+      // GitHub Pages SPA redirect trick
+      // Store the full URL in sessionStorage and redirect to the root
+      var path = window.location.pathname;
+      var base = '/geospatial-saas'; // change to your repo name
+      sessionStorage.redirect = window.location.href;
+      window.location.replace(base + '/?p=' + encodeURIComponent(path));
+    </script>
+  </head>
+  <body></body>
+</html>
