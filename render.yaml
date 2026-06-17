@@ -30,6 +30,6 @@ services:
       - key: SYNC_DATABASE_URL
         sync: false
       - key: CORS_ORIGINS
-        value: https://YOUR_USERNAME.github.io
+        value: https://mkanakala10.github.io
       - key: GEMINI_API_KEY
         sync: false
