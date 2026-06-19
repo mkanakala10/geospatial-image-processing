@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+import 'leaflet-draw'
+import 'leaflet-draw/dist/leaflet.draw.css'
 import type { Region, GeoJsonGeometry } from '@/types'
 import { useMapStore } from '@/store/mapStore'
 
@@ -76,36 +77,37 @@ function DrawControl() {
     map.addLayer(drawnItems)
     drawnItemsRef.current = drawnItems
 
-    // Dynamically load leaflet-draw
-    import('leaflet-draw').then(() => {
-      const drawControl = new (L.Control as unknown as { Draw: new (opts: unknown) => L.Control }).Draw({
-        position: 'topright',
-        draw: {
-          polygon: { shapeOptions: { color: '#14b8a6', weight: 2, fillOpacity: 0.15 } },
-          rectangle: { shapeOptions: { color: '#14b8a6', weight: 2, fillOpacity: 0.15 } },
-          circle: false,
-          circlemarker: false,
-          polyline: false,
-          marker: false,
-        },
-        edit: { featureGroup: drawnItems },
-      })
-      map.addControl(drawControl)
+    // leaflet-draw loaded via static import (CSS + sprites)
+    const drawControl = new (L.Control as unknown as { Draw: new (opts: unknown) => L.Control }).Draw({
+      position: 'topright',
+      draw: {
+        polygon: { shapeOptions: { color: '#14b8a6', weight: 2, fillOpacity: 0.15 } },
+        rectangle: { shapeOptions: { color: '#14b8a6', weight: 2, fillOpacity: 0.15 } },
+        circle: false,
+        circlemarker: false,
+        polyline: false,
+        marker: false,
+      },
+      edit: { featureGroup: drawnItems },
+    })
+    map.addControl(drawControl)
 
-      map.on(L.Draw.Event.CREATED, (e: unknown) => {
-        const event = e as { layer: L.Layer & { toGeoJSON: () => { geometry: GeoJsonGeometry } } }
-        drawnItems.clearLayers()
-        drawnItems.addLayer(event.layer)
-        const geojson = event.layer.toGeoJSON()
-        setDrawnGeometry(geojson.geometry)
-      })
+    map.on(L.Draw.Event.CREATED, (e: unknown) => {
+      const event = e as { layer: L.Layer & { toGeoJSON: () => { geometry: GeoJsonGeometry } } }
+      drawnItems.clearLayers()
+      drawnItems.addLayer(event.layer)
+      const geojson = event.layer.toGeoJSON()
+      setDrawnGeometry(geojson.geometry)
+    })
 
-      map.on(L.Draw.Event.DELETED, () => {
-        setDrawnGeometry(null)
-      })
+    map.on(L.Draw.Event.DELETED, () => {
+      setDrawnGeometry(null)
     })
 
     return () => {
+      map.removeControl(drawControl)
+      map.off(L.Draw.Event.CREATED)
+      map.off(L.Draw.Event.DELETED)
       map.removeLayer(drawnItems)
     }
   }, [map, setDrawnGeometry])

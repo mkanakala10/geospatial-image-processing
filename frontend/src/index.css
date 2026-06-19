@@ -1,4 +1,5 @@
 @import 'leaflet/dist/leaflet.css';
+@import 'leaflet-draw/dist/leaflet.draw.css';
 
 @tailwind base;
 @tailwind components;
@@ -132,13 +133,37 @@
   font-family: inherit;
 }
 
-.leaflet-control-zoom a,
-.leaflet-bar a {
+.leaflet-control-zoom a {
   @apply rounded-md border-gray-600 bg-surface-card text-gray-200 !important;
 }
 
 .leaflet-control-zoom a:hover {
   @apply bg-surface-panel !important;
+}
+
+/* Draw toolbar: keep sprite icons; don't inherit zoom/button text styles */
+.leaflet-draw-toolbar a {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  background-color: #fff;
+  color: transparent;
+}
+
+.leaflet-draw-toolbar a:hover {
+  background-color: #f4f4f4;
+}
+
+.leaflet-draw a .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .leaflet-popup-content-wrapper {
